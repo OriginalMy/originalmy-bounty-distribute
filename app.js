@@ -59,7 +59,7 @@ fs.createReadStream(inputFilePath)
         if (web3.isAddress(data.WALLET)){
             console.log("email: " + data.EMAIL + ", wallet: " + data.WALLET + ", ABC: "+ earnedAbc);
             log.info("email: " + data.EMAIL + ", wallet: " + data.WALLET + ", ABC: "+ earnedAbc)
-            // abc.transfer(data.WALLET,earnedAbc, {from: web.eth.accounts[0]})
+            abc.transfer(data.WALLET, earnedAbc, {from: web3.eth.defaultAccount})
             totalDistributed += earnedAbc;
             totalUsers += 1;
         } else {
