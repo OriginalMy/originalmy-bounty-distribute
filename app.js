@@ -1,7 +1,9 @@
 var fs = require('fs');
 var csv = require('csv-parser')
 
+
 var inputFilePath = "originalmy-3-years-abc-bounty-program_2018-07-29_03-24-49-winners - Pivot Table 1.csv"
+
 var stream = csv({
   raw: false,     // do not decode to utf-8 strings
   separator: ',', // specify optional cell separator
@@ -28,4 +30,5 @@ fs.createReadStream(inputFilePath)
 })
 .on('end',function(){
     console.log('All wallets parsed')
-});  
+});
+
