@@ -1,6 +1,8 @@
-var fs = require('fs');
-var csv = require('csv-parser')
-var Web3 = require('web3');
+const fs = require('fs');
+const csv = require('csv-parser');
+const Web3 = require('web3');
+
+const args = process.argv;
 
 var web3 = new Web3();
 var eth = web3.eth;
@@ -10,7 +12,13 @@ web3.setProvider(new web3.providers.HttpProvider("http://localhost:8545"));
 
 web3.eth.defaultAccount = eth.accounts[0];
 
-var inputFilePath = "originalmy-3-years-abc-bounty-program_2018-07-29_03-24-49-winners - Pivot Table 1.csv"
+if (typeof args[2] == 'undefined') {
+    console.log('Missing parameter: file.csv (file format: email,wallet,abc)');
+    process.exit(0)
+}else {
+    var inputFilePath = args[2];
+}    
+    
 
 /* TESTNET ABC - Anti Bureaucracy Coin TESTNET */
 var abcAddress = '0xeec0de4a3ebb0233b10f255da9cb8057205744ea';
@@ -36,13 +44,13 @@ fs.createReadStream(inputFilePath)
 .on('data', function(data){
     try {
         earnedAbc = data.ENTRIES*100000000;
-        console.log("Email: " + data.EMAIL + " Wallet: " + data.WALLET + " ABC: "+ earnedAbc);
+        console.log("email: " + data.EMAIL + ", wallet: " + data.WALLET + ", ABC: "+ earnedAbc);
         // abc.transfer(data.WALLET,earnedAbc, {from: web.eth.accounts[0]})
         totalDistributed += earnedAbc;
         totalUsers += 1;
     }
     catch(err) {
-        console.err(err);
+        console.log(err);
     }
 })
 .on('end',function(){
