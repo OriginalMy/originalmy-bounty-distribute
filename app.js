@@ -42,47 +42,12 @@ if (typeof args[2] == 'undefined') {
 
 const listErros = "";
 
-var totalDistributed = 0;
-var totalUsers = 0;
-var totalInvalidWallets = 0;
-var totalDidntReceived = 0;
-var invalidWallet = [];
-var doesntReceiveWallet = [];
-var initialBalance = eth.getBalance(web3.eth.defaultAccount);
-
-var log = SimpleNodeLogger.createSimpleLogger(opts);
-log.info("---------------------");
-log.info("Starting a new bounty distribution");
-
-fs.createReadStream(inputFilePath)
-.pipe(stream)
-.on('data', function(data){
-    try {
-        earnedAbc = data.ENTRIES*100000000;
-        if (web3.isAddress(data.WALLET)){
-            
-            try {
-                abc.transfer(data.WALLET, earnedAbc, {from: web3.eth.defaultAccount})
-                log.info("Sent OK! email: " + data.EMAIL + ", wallet: " + data.WALLET + ", ABC: "+ earnedAbc)
-                totalDistributed += earnedAbc;
-                totalUsers += 1;
-            } catch(err) {
-                totalDidntReceived += 1;
-                doesntReceiveWallet.push({"email":data.EMAIL, "wallet":data.WALLET});
-                log.warn('Couldnt send to wallet: ' + data.WALLET + ' email: ' + data.EMAIL);
-                log.error("It was not possible to send ABC because of an error");
-                log.error(err);
-            };
-
-        } else {
-            totalInvalidWallets += 1;
-            invalidWallet.push({"email":data.EMAIL, "wallet":data.WALLET});
-            log.warn('Invalid wallet: ' + data.WALLET + ' email: ' + data.EMAIL);
-            
-        }
-    }
-    catch(err) {
-        log.error(err);
+fs.readFile('valid.json', 'utf8', function readFileCallback(err, data) {
+    var totalDistributed = 0;
+    var totalUsers = 0;
+    var invalidWallet = [];
+    var validateWallet = [];
+    if (err) {
         console.log(err);
     } else {
         validateWallet = data ? JSON.parse(data) : []; //now it an object
@@ -144,14 +109,6 @@ fs.createReadStream(inputFilePath)
 
                 
     }
-})
-.on('end',function(){
-    log.info('Wallet Balance: ' + web3.fromWei(initialBalance) + ' eth');
-    log.info('ABC wallet balance: '+ abc.balanceOf(web3.eth.defaultAccount)/(100000000) + ' ABC');
-    log.info('Total ABC Distributed: ', totalDistributed/100000000 );
-    log.info('Total users: ' + totalUsers );
-    log.warn('Invalid wallets total: ' + totalInvalidWallets + ' : ' + JSON.stringify(invalidWallet));
-    log.warn('Problem while sending: ' + totalDidntReceived + ' : ' + JSON.stringify(doesntReceiveWallet));
 });
 
 
