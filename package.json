@@ -4,11 +4,10 @@
   "description": "Distribute ABC Bounty Program",
   "main": "app.js",
   "dependencies": {
-    "async": "^2.6.1",
-    "csv-parse": "^2.5.0",
     "csv-parser": "^1.12.1",
     "fs": "0.0.1-security",
-    "web3": "^1.0.0-beta.35"
+    "hooked-web3-provider": "^1.0.0",
+    "web3": "github:ethereum/web3.js"
   },
   "devDependencies": {},
   "scripts": {
