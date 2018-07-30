@@ -7,6 +7,7 @@
     "csv-parser": "^1.12.1",
     "fs": "0.0.1-security",
     "hooked-web3-provider": "^1.0.0",
+    "simple-node-logger": "^0.93.37",
     "web3": "github:ethereum/web3.js"
   },
   "devDependencies": {},
