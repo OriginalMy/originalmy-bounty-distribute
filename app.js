@@ -38,16 +38,22 @@ var stream = csv({
 
 var totalDistributed = 0;
 var totalUsers = 0;
+var invalidWallet = [];
 
 fs.createReadStream(inputFilePath)
 .pipe(stream)
 .on('data', function(data){
     try {
         earnedAbc = data.ENTRIES*100000000;
-        console.log("email: " + data.EMAIL + ", wallet: " + data.WALLET + ", ABC: "+ earnedAbc);
-        // abc.transfer(data.WALLET,earnedAbc, {from: web.eth.accounts[0]})
-        totalDistributed += earnedAbc;
-        totalUsers += 1;
+        if (web3.isAddress(data.WALLET)){
+            console.log("email: " + data.EMAIL + ", wallet: " + data.WALLET + ", ABC: "+ earnedAbc);
+            // abc.transfer(data.WALLET,earnedAbc, {from: web.eth.accounts[0]})
+            totalDistributed += earnedAbc;
+            totalUsers += 1;
+        } else {
+            invalidWallet.push({"email":data.EMAIL, "wallet":data.WALLET});
+        }
+        
     }
     catch(err) {
         console.log(err);
@@ -56,7 +62,8 @@ fs.createReadStream(inputFilePath)
 .on('end',function(){
     console.log('Default account $ETH balance: ' + web3.fromWei(eth.getBalance(web3.eth.defaultAccount)) + ' eth');
     console.log('ABC Total Supply: '+ abc.totalSupply()/(100000000) + ' ABC');
-    console.log('Total ABC Distributed: ', totalDistributed/100000000 )
-    console.log('Total users: ' + totalUsers )
+    console.log('Total ABC Distributed: ', totalDistributed/100000000 );
+    console.log('Total users: ' + totalUsers );
+    console.log('Invalid wallets: ' + JSON.stringify(invalidWallet));
 });
 
