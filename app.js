@@ -2,11 +2,32 @@ const fs = require('fs');
 const csv = require('csv-parser');
 const Web3 = require('web3');
 
+const SimpleNodeLogger = require('simple-node-logger');
+var opts = {
+    logFilePath:'logs/distributing-'+Date.now()+'.log',
+    timestampFormat:'YYYY-MM-DD HH:mm:ss.SSS'
+}
+
+function saveJSONFile(array, file) {
+    var json = JSON.stringify(array);
+    fs.writeFileSync(file, json, 'utf8', callback);
+
+}
+function callback(err) {
+    console.log(err);
+}
+
+
 const args = process.argv;
+if (typeof args[2] == 'undefined') {
+    console.log('Missing parameter: file.csv (file format: email,wallet,abc)');
+    process.exit(1);
+} else {
+    var inputFilePath = args[2];
+}    
 
 var web3 = new Web3();
 var eth = web3.eth;
-
 /* Inicializa conexão com o node local */
 web3.setProvider(new web3.providers.HttpProvider("http://localhost:8545"));
 
@@ -86,15 +107,11 @@ fs.readFile('valid.json', 'utf8', function readFileCallback(err, data) {
 
             });
 
-        function saveJSONFile(array, file) {
-            var json = JSON.stringify(array);
-            fs.writeFile(file, json, 'utf8', callback);
-
-        }
-        function callback(err) {
-            console.log(err);
-        }
+                
     }
 });
+
+
+
 
 /* TESTNET ABC - Anti Bureaucracy Coin TESTNET */

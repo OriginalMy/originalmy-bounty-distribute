@@ -2,3 +2,5 @@ node_modules/
 *.csv
 package-lock.json
 .vscode/
+*.log
+logs
