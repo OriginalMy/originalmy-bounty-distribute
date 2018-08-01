@@ -120,3 +120,5 @@ fs.readFile('valid.json', 'utf8', function readFileCallback(err, data) {
         });
     };
 });
+
+/* TESTNET ABC - Anti Bureaucracy Coin TESTNET */
