@@ -134,13 +134,13 @@ fs.readFile('json/valid.json', 'utf8', function readFileCallback(err, data) {
             log.info('Total users: ' + totalUsers );
             log.warn('Invalid wallets total: ' + totalInvalidWallets + ' : ' + JSON.stringify(invalidWallet));
             log.warn('Problem while sending: ' + totalDidntReceived + ' : ' + JSON.stringify(doesntReceiveWallet));
-            
+            log.info("Finishing the bounty distribution");
+            log.info("Filename: " + inputFilePath);
+            log.info("---------------------");
         });
     };
 });
 
-log.info("Finishing the bounty distribution");
-log.info("Filename: " + inputFilePath);
-log.info("---------------------");
+
 
 /* END */
