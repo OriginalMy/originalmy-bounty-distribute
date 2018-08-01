@@ -112,6 +112,7 @@ fs.readFile('valid.json', 'utf8', function readFileCallback(err, data) {
                         
                     }
                 } else {
+                    doesntReceiveWallet.push({"email":data.EMAIL, "wallet":data.WALLET});
                     log.info("Already received! email: " + data.EMAIL + ", wallet: " + data.WALLET)
                 }
             }
@@ -122,9 +123,9 @@ fs.readFile('valid.json', 'utf8', function readFileCallback(err, data) {
         .on('end',function(){
 
             /* Almost finishing, lets log something */
-            saveJSONFile(invalidWallet, "invalid.json");
-            saveJSONFile(doesntReceiveWallet, "errors.json");
-            saveJSONFile(validWallet, "valid.json");
+            saveJSONFile(invalidWallet, 'json/invalid'+Date.now()+'.json');
+            saveJSONFile(doesntReceiveWallet, 'json/errors'+Date.now()+'.json');
+            saveJSONFile(validWallet, 'json/valid.json');
             log.info('Wallet Balance: ' + web3.fromWei(initialBalance) + ' eth');
             log.info('ABC wallet balance: '+ abc.balanceOf(web3.eth.defaultAccount)/(100000000) + ' ABC');
             log.info('Total ABC Distributed: ', totalDistributed/100000000 );
