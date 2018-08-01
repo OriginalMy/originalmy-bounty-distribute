@@ -74,7 +74,7 @@ var initialBalance = eth.getBalance(web3.eth.defaultAccount);
 log.info("---------------------");
 log.info("Starting a new bounty distribution");
 
-fs.readFile('valid.json', 'utf8', function readFileCallback(err, data) {
+fs.readFile('json/valid.json', 'utf8', function readFileCallback(err, data) {
 
     if (err) {
         log.error(err);
