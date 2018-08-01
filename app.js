@@ -2,6 +2,14 @@ const fs = require('fs');
 const csv = require('csv-parser');
 const Web3 = require('web3');
 
+const SimpleNodeLogger = require('simple-node-logger');
+var opts = {
+    logFilePath:'logs/distributing-'+Date.now()+'.log',
+    timestampFormat:'YYYY-MM-DD HH:mm:ss.SSS'
+}
+var log = SimpleNodeLogger.createSimpleLogger(opts);
+
+/* Write JSON to file */
 function saveJSONFile(array, file) {
     var json = JSON.stringify(array);
     fs.writeFileSync(file, json, 'utf8', callback);
@@ -11,12 +19,7 @@ function callback(err) {
     log.error(err);
 }
 
-const SimpleNodeLogger = require('simple-node-logger');
-var opts = {
-    logFilePath:'logs/distributing-'+Date.now()+'.log',
-    timestampFormat:'YYYY-MM-DD HH:mm:ss.SSS'
-}
-
+/* Test command line parameter */
 const args = process.argv;
 if (typeof args[2] == 'undefined') {
     console.log('Missing parameter: file.csv (file format: email,wallet,abc)');
@@ -25,9 +28,10 @@ if (typeof args[2] == 'undefined') {
     var inputFilePath = args[2];
 }    
 
+/* Initialize all web3 connections to Ethereum */
 var web3 = new Web3();
 var eth = web3.eth;
-/* Inicializa conexão com o node local */
+
 web3.setProvider(new web3.providers.HttpProvider("http://localhost:8545"));
 if(!web3.isConnected()) {
     console.log("Web3 ethereum provider not found. Check if node is running on localhost with RPC enabled");
@@ -41,6 +45,9 @@ var abcAbi = [{"constant":true,"inputs":[],"name":"name","outputs":[{"name":"","
 var abcContract = web3.eth.contract(abcAbi)
 var abc = abcContract.at(abcAddress)
 
+/* Format the stream of csv file with all participants 
+    File format: email,wallet,entries
+*/
 var stream = csv({
   raw: false,     // do not decode to utf-8 strings
   separator: ',', // specify optional cell separator
@@ -51,6 +58,8 @@ var stream = csv({
   headers: ['EMAIL', 'WALLET', 'ENTRIES'] // Specifing the headers
 });
 
+
+/* Initialize accounting some vars */
 var totalDistributed = 0;
 var totalUsers = 0;
 var totalInvalidWallets = 0;
@@ -60,7 +69,8 @@ var validWallet = [];
 var doesntReceiveWallet = [];
 var initialBalance = eth.getBalance(web3.eth.defaultAccount);
 
-var log = SimpleNodeLogger.createSimpleLogger(opts);
+/* Here the game starts */
+
 log.info("---------------------");
 log.info("Starting a new bounty distribution");
 
@@ -69,12 +79,14 @@ fs.readFile('valid.json', 'utf8', function readFileCallback(err, data) {
     if (err) {
         log.error(err);
     } else {
-        validWallet = data ? JSON.parse(data) : []; //now it an object
+        validWallet = data ? JSON.parse(data) : [];
 
         fs.createReadStream(inputFilePath)
         .pipe(stream)
         .on('data', function(data){
             try {
+                
+                /* Validate if already sent, if the wallet is valid and then the transfer */
                 if (validWallet.findIndex(function (item) { return item.wallet === data.WALLET }) < 0) {
                     earnedAbc = data.ENTRIES*100000000;
                     if (web3.isAddress(data.WALLET)){
@@ -108,6 +120,8 @@ fs.readFile('valid.json', 'utf8', function readFileCallback(err, data) {
             }
         })
         .on('end',function(){
+
+            /* Almost finishing, lets log something */
             saveJSONFile(invalidWallet, "invalid.json");
             saveJSONFile(doesntReceiveWallet, "errors.json");
             saveJSONFile(validWallet, "valid.json");
@@ -121,4 +135,4 @@ fs.readFile('valid.json', 'utf8', function readFileCallback(err, data) {
     };
 });
 
-/* TESTNET ABC - Anti Bureaucracy Coin TESTNET */
+/* END */
