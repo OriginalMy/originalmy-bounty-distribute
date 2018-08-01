@@ -73,6 +73,7 @@ var initialBalance = eth.getBalance(web3.eth.defaultAccount);
 
 log.info("---------------------");
 log.info("Starting a new bounty distribution");
+log.info("Filename: " + inputFilePath);
 
 fs.readFile('json/valid.json', 'utf8', function readFileCallback(err, data) {
 
@@ -112,6 +113,7 @@ fs.readFile('json/valid.json', 'utf8', function readFileCallback(err, data) {
                         
                     }
                 } else {
+                    totalDidntReceived += 1;
                     doesntReceiveWallet.push({"email":data.EMAIL, "wallet":data.WALLET});
                     log.info("Already received! email: " + data.EMAIL + ", wallet: " + data.WALLET)
                 }
@@ -132,8 +134,13 @@ fs.readFile('json/valid.json', 'utf8', function readFileCallback(err, data) {
             log.info('Total users: ' + totalUsers );
             log.warn('Invalid wallets total: ' + totalInvalidWallets + ' : ' + JSON.stringify(invalidWallet));
             log.warn('Problem while sending: ' + totalDidntReceived + ' : ' + JSON.stringify(doesntReceiveWallet));
+            
         });
     };
 });
+
+log.info("Finishing the bounty distribution");
+log.info("Filename: " + inputFilePath);
+log.info("---------------------");
 
 /* END */
