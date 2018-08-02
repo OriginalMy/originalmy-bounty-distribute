@@ -4,7 +4,7 @@ const Web3 = require('web3');
 
 const SimpleNodeLogger = require('simple-node-logger');
 var opts = {
-    logFilePath:'logs/distributing-'+Date.now()+'.log',
+    logFilePath:'logs/checking-'+Date.now()+'.log',
     timestampFormat:'YYYY-MM-DD HH:mm:ss.SSS'
 }
 var log = SimpleNodeLogger.createSimpleLogger(opts);
@@ -77,6 +77,7 @@ var stream = csv({
 
 
 /* Initialize accounting some vars */
+var balance = 0;
 var totalDistributed = 0;
 var totalUsers = 0;
 var totalInvalidWallets = 0;
@@ -84,15 +85,10 @@ var totalDidntReceived = 0;
 var invalidWallet = [];
 var validWallet = [];
 var doesntReceiveWallet = [];
-var transferTx = [];
-
-
-
-var initialBalance = eth.getBalance(web3.eth.defaultAccount);
 
 /* Here the game starts */
 
-log.info("Starting a new bounty distribution");
+log.info("Starting a new bounty verification");
 log.info("Filename: " + inputFilePath);
 
 fs.readFile('json/valid.json', 'utf8', function readFileCallback(err, data) {
@@ -105,53 +101,27 @@ fs.readFile('json/valid.json', 'utf8', function readFileCallback(err, data) {
         fs.createReadStream(inputFilePath)
         .pipe(stream)
         .on('data', function(data){
-            try {
-                
-                /* Validate if already sent, if the wallet is valid and then the transfer */
-                if (validWallet.findIndex(function (item) { return item.wallet === data.WALLET }) < 0) {
-                    earnedAbc = data.ENTRIES*100000000;
-                    if (web3.isAddress(data.WALLET)){
-                        // gasPrice High: 36681296496, gasPrice suggested: 5000000000, gasPrice Ok: 10000000000
-                        // Verify https://etherscan.io/gasTracker and https://ethgasstation.info/ before sending.
-                        // Setting eth.gasPrice * 5
-                        try {
-                            abc.transfer(data.WALLET, earnedAbc, {from: web3.eth.defaultAccount, gas: 52649, gasPrice: eth.gasPrice*5}, function(err, hash) {
-                                if (!err){
-                                    log.info("Wallet: " + data.WALLET + ", Tx: " + hash);
-                                    transferTx.push({"wallet": data.WALLET, "tx": hash })
-                                    saveJSONFile(transferTx, 'json/transactions-'+Date.now()+'.json');
-
-                                } else {
-                                    totalDidntReceived += 1;
-                                    doesntReceiveWallet.push({"email":data.EMAIL, "wallet":data.WALLET});
-                                    log.warn('Couldnt send to wallet: ' + data.WALLET + ' email: ' + data.EMAIL);
-                                    log.error("It was not possible to send ABC because of an error");
-                                    log.error(err);
-                                };
-                            });
-                            log.info("Sent OK! email: " + data.EMAIL + ", wallet: " + data.WALLET + ", ABC: "+ data.ENTRIES)
-                            totalDistributed += earnedAbc;
-                            totalUsers += 1;
-                            validWallet.push({ "email": data.EMAIL, "wallet": data.WALLET });
-                        } catch(err) {
-                            totalDidntReceived += 1;
-                            doesntReceiveWallet.push({"email":data.EMAIL, "wallet":data.WALLET});
-                            log.warn('Couldnt send to wallet: ' + data.WALLET + ' email: ' + data.EMAIL);
-                            log.error("It was not possible to send ABC because of an error");
-                            log.error(err);
-                        };
-
+            try { 
+                if (web3.isAddress(data.WALLET)){
+                    balance = (abc.balanceOf(data.WALLET)/100000000);
+                    if (balance > 0){;
+                        log.info("Received: email: " + data.EMAIL + ", wallet: " + data.WALLET + ", ABC: "+ balance)
+                        totalDistributed += balance;
+                        totalUsers += 1;
+                        validWallet.push({ "email": data.EMAIL, "wallet": data.WALLET });
                     } else {
+                        totalDidntReceived += 1;
+                        doesntReceiveWallet.push({"email":data.EMAIL, "wallet":data.WALLET});
+                        log.info("Didn't receive: email: " + data.EMAIL + ", wallet: " + data.WALLET)
+                    };
+
+                } else {
                         totalInvalidWallets += 1;
                         invalidWallet.push({"email":data.EMAIL, "wallet":data.WALLET});
                         log.warn('Invalid wallet: ' + data.WALLET + ' email: ' + data.EMAIL);
-                        
-                    }
-                } else {
-                    totalDidntReceived += 1;
-                    doesntReceiveWallet.push({"email":data.EMAIL, "wallet":data.WALLET});
-                    log.info("Already received! email: " + data.EMAIL + ", wallet: " + data.WALLET)
+                    
                 }
+        
             }
             catch(err) {
                 log.error(err);
@@ -160,16 +130,14 @@ fs.readFile('json/valid.json', 'utf8', function readFileCallback(err, data) {
         .on('end',function(){
 
             /* Almost finishing, lets log something */
-            saveJSONFile(invalidWallet, 'json/invalid-'+Date.now()+'.json');
-            saveJSONFile(doesntReceiveWallet, 'json/errors-'+Date.now()+'.json');
-            saveJSONFile(validWallet, 'json/valid.json');
-            log.info('Wallet Balance: ' + web3.fromWei(initialBalance) + ' eth');
-            log.info('ABC wallet balance: '+ abc.balanceOf(web3.eth.defaultAccount)/(100000000) + ' ABC');
+            saveJSONFile(invalidWallet, 'json/check-invalid.json');
+            saveJSONFile(doesntReceiveWallet, 'json/check-errors.json');
+            saveJSONFile(validWallet, 'json/check-received.json');
             log.info('Total ABC Distributed: ', totalDistributed/100000000 );
-            log.info('Total users: ' + totalUsers );
-            log.warn('Invalid wallets total: ' + totalInvalidWallets + ' : ' + JSON.stringify(invalidWallet));
-            log.warn('Problem while sending: ' + totalDidntReceived + ' : ' + JSON.stringify(doesntReceiveWallet));
-            log.info("Finishing the bounty distribution");
+            log.info('Received: ' + totalUsers );
+            log.warn('Didnt receive: ' + totalDidntReceived );
+            log.warn('Invalid wallets: ' + totalInvalidWallets);
+            log.info("Finishing the bounty checking");
             log.info("Filename: " + inputFilePath);
             log.info("---------------------");
         });
