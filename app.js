@@ -2,6 +2,7 @@ const fs = require('fs');
 const csv = require('csv-parser');
 const Web3 = require('web3');
 const SimpleNodeLogger = require('simple-node-logger');
+var path = require("path");
 
 /* Creates a folder if it not exists */
 var date = Date.now();
@@ -211,13 +212,20 @@ fs.readFile('json/received.json', 'utf8', function readFileCallback(err, data) {
             .on('end', function () {
 
 
-                /* Almost finishing, lets log something */
+                /* Almost finishing, lets save everything */
                 saveJSONFile(invalidWallet, dirName + '/invalid-' + date + '.json');
                 saveJSONFile(didntReceiveWallet, dirName + '/errors-' + date + '.json');
                 saveJSONFile(transferTx, dirName + '/transactions-' + date + '.json');
                 saveJSONFile(receivedWallet, dirName + '/received-' + date + '.json');
 
+                /* Make things together */
+                fs.copyFile('./' + inputFilePath, './' + date + '/' + path.basename(inputFilePath), (err) => {
+                    if (err) throw err;
+                    log.info(inputFilePath + ' copied to ' + date + '/' + path.basename(inputFilePath));
+                });
 
+                /* to get job done, just log a little */
+                log.info("---------------------");
                 log.info('Wallet Balance: ' + web3.fromWei(initialBalance) + ' eth');
                 log.info('ABC wallet balance: ' + abc.balanceOf(web3.eth.defaultAccount) / (100000000) + ' ABC');
                 log.info('Total ABC Distributed: ', totalDistributed / 100000000);
