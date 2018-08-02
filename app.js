@@ -119,7 +119,7 @@ fs.readFile('json/valid.json', 'utf8', function readFileCallback(err, data) {
                                 if (!err){
                                     log.info("Wallet: " + data.WALLET + ", Tx: " + hash);
                                     transferTx.push({"wallet": data.WALLET, "tx": hash })
-                                    saveJSONFile(transferTx, 'json/transactions-'+Date.now()+'.json');
+                                    saveJSONFile(transferTx, 'json/transactions.json');
 
                                 } else {
                                     totalDidntReceived += 1;
