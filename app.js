@@ -7,7 +7,7 @@ var path = require("path");
 /* Creates a folder if it not exists */
 var date = Date.now();
 var dirName = './' + date;
-if (!fs.existsSync(dirName)){
+if (!fs.existsSync(dirName)) {
     fs.mkdirSync(dirName);
 }
 
@@ -123,7 +123,7 @@ fs.readFile('json/received.json', 'utf8', function readFileCallback(err, data) {
 
         receivedWallet = data ? JSON.parse(data) : [];
 
-        
+
         /* Read the file from command line */
         var is = fs.createReadStream(inputFilePath)
             .pipe(stream)
@@ -146,8 +146,12 @@ fs.readFile('json/received.json', 'utf8', function readFileCallback(err, data) {
 
                                     if (!err) {
 
-                                        log.info("Wallet: " + data.WALLET + ", Tx: " + hash);
+                                        totalDistributed += earnedAbc;
+                                        totalUsers += 1;
                                         transferTx.push({ "wallet": data.WALLET, "tx": hash })
+                                        receivedWallet.push({ "email": data.EMAIL, "wallet": data.WALLET });
+                                        log.info("Wallet: " + data.WALLET + ", Tx: " + hash);
+                                        log.info("Sent OK! email: " + data.EMAIL + ", wallet: " + data.WALLET + ", ABC: " + data.ENTRIES)
 
                                     } else {
 
@@ -160,13 +164,6 @@ fs.readFile('json/received.json', 'utf8', function readFileCallback(err, data) {
                                     };
 
                                 });
-
-
-                                log.info("Sent OK! email: " + data.EMAIL + ", wallet: " + data.WALLET + ", ABC: " + data.ENTRIES)
-                                totalDistributed += earnedAbc;
-                                totalUsers += 1;
-                                receivedWallet.push({ "email": data.EMAIL, "wallet": data.WALLET });
-
 
                             } catch (err) {
 
@@ -217,8 +214,9 @@ fs.readFile('json/received.json', 'utf8', function readFileCallback(err, data) {
                 saveJSONFile(didntReceiveWallet, dirName + '/errors-' + date + '.json');
                 saveJSONFile(transferTx, dirName + '/transactions-' + date + '.json');
                 saveJSONFile(receivedWallet, dirName + '/received-' + date + '.json');
+                saveJSONFile(receivedWallet, 'json/received.json');
 
-                /* Make things together */
+                /* Put the things together */
                 fs.copyFile('./' + inputFilePath, './' + date + '/' + path.basename(inputFilePath), (err) => {
                     if (err) throw err;
                     log.info(inputFilePath + ' copied to ' + date + '/' + path.basename(inputFilePath));
