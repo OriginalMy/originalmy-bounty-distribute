@@ -109,14 +109,11 @@ fs.readFile('json/valid.json', 'utf8', function readFileCallback(err, data) {
                     if (web3.isAddress(data.WALLET)){
                         // gasPrice High: 36681296496, gasPrice suggested: 5000000000, gasPrice Ok: 10000000000
                         // Verify https://etherscan.io/gasTracker and https://ethgasstation.info/ before sending.
-                        // Setting eth.gasPrice * 10
+                        // Setting eth.gasPrice * 5
                         try {
-                            abc.transfer(data.WALLET, earnedAbc, {from: web3.eth.defaultAccount, gas: 52649, gasPrice: eth.gasPrice*10}, function(err, hash) {
+                            abc.transfer(data.WALLET, earnedAbc, {from: web3.eth.defaultAccount, gas: 52649, gasPrice: eth.gasPrice*5}, function(err, hash) {
                                 if (!err){
-                                    log.info("Sent OK! email: " + data.EMAIL + ", wallet: " + data.WALLET + ", ABC: "+ data.ENTRIES + ", Tx: " + hash)
-                                    totalDistributed += earnedAbc;
-                                    totalUsers += 1;
-                                    validWallet.push({ "email": data.EMAIL, "wallet": data.WALLET });
+                                    log.info("Wallet: " + data.WALLET + ", Tx: " + hash);
                                 } else {
                                     totalDidntReceived += 1;
                                     doesntReceiveWallet.push({"email":data.EMAIL, "wallet":data.WALLET});
@@ -125,6 +122,10 @@ fs.readFile('json/valid.json', 'utf8', function readFileCallback(err, data) {
                                     log.error(err);
                                 };
                             });
+                            log.info("Sent OK! email: " + data.EMAIL + ", wallet: " + data.WALLET + ", ABC: "+ data.ENTRIES)
+                            totalDistributed += earnedAbc;
+                            totalUsers += 1;
+                            validWallet.push({ "email": data.EMAIL, "wallet": data.WALLET });
                         } catch(err) {
                             totalDidntReceived += 1;
                             doesntReceiveWallet.push({"email":data.EMAIL, "wallet":data.WALLET});
