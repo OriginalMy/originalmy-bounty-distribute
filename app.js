@@ -8,6 +8,7 @@ var opts = {
     timestampFormat:'YYYY-MM-DD HH:mm:ss.SSS'
 }
 var log = SimpleNodeLogger.createSimpleLogger(opts);
+log.info("---------------------");
 
 /* Write JSON to file */
 function saveJSONFile(array, file) {
@@ -27,12 +28,6 @@ if (typeof args[2] == 'undefined') {
 } else {
     var inputFilePath = args[2];
 }    
-// if (typeof args[3] == 'undefined') {
-//     console.log('Missing parameter: testnet|mainnet');
-//     process.exit(1);
-// } else {
-//     var network = args[3];
-// }
 
 /* Initialize all web3 connections to Ethereum */
 var web3 = new Web3();
@@ -53,17 +48,17 @@ switch (networkId) {
         var abcAddress = '0xAfd75caff5c1d402cbF3692e289775438dF6a9F0';
         var abcAbi = [{"constant":true,"inputs":[],"name":"name","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_value","type":"uint256"}],"name":"approve","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"totalSupply","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_from","type":"address"},{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],"name":"transferFrom","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"decimals","outputs":[{"name":"","type":"uint8"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"version","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"balance","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"owner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_vanishQty","type":"uint256"}],"name":"vanishToken","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"symbol","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],"name":"transfer","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"frozenAccount","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_issueQty","type":"uint256"}],"name":"issueNew","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_value","type":"uint256"},{"name":"_extraData","type":"bytes"}],"name":"approveAndCall","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"_owner","type":"address"},{"name":"_spender","type":"address"}],"name":"allowance","outputs":[{"name":"remaining","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_target","type":"address"},{"name":"_freeze","type":"bool"}],"name":"freezeAccount","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_newOwner","type":"address"}],"name":"transferOwnership","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"inputs":[{"name":"_initialAmount","type":"uint256"},{"name":"_tokenName","type":"string"},{"name":"_decimalUnits","type":"uint8"},{"name":"_tokenSymbol","type":"string"}],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"name":"_from","type":"address"},{"indexed":true,"name":"_to","type":"address"},{"indexed":false,"name":"_value","type":"uint256"}],"name":"Transfer","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"_owner","type":"address"},{"indexed":true,"name":"_spender","type":"address"},{"indexed":false,"name":"_value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"_target","type":"address"},{"indexed":false,"name":"_frozen","type":"bool"}],"name":"FrozenFunds","type":"event"}];
         var abc = web3.eth.contract(abcAbi).at(abcAddress);
-        log.info("Network: Mainnet");
+        log.info("Selected network: Mainnet");
         break
     case '4':
         /* TESTNET ABC - Anti Bureaucracy Coin TESTNET */
         var abcAddress = '0xeec0de4a3ebb0233b10f255da9cb8057205744ea';
         var abcAbi = [{"constant":true,"inputs":[],"name":"name","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_value","type":"uint256"}],"name":"approve","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"totalSupply","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_from","type":"address"},{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],"name":"transferFrom","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"decimals","outputs":[{"name":"","type":"uint8"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"version","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"balance","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"owner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_vanishQty","type":"uint256"}],"name":"vanishToken","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"symbol","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],"name":"transfer","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"frozenAccount","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_issueQty","type":"uint256"}],"name":"issueNew","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_value","type":"uint256"},{"name":"_extraData","type":"bytes"}],"name":"approveAndCall","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"_owner","type":"address"},{"name":"_spender","type":"address"}],"name":"allowance","outputs":[{"name":"remaining","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_target","type":"address"},{"name":"_freeze","type":"bool"}],"name":"freezeAccount","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_newOwner","type":"address"}],"name":"transferOwnership","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"inputs":[{"name":"_initialAmount","type":"uint256"},{"name":"_tokenName","type":"string"},{"name":"_decimalUnits","type":"uint8"},{"name":"_tokenSymbol","type":"string"}],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"name":"_from","type":"address"},{"indexed":true,"name":"_to","type":"address"},{"indexed":false,"name":"_value","type":"uint256"}],"name":"Transfer","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"_owner","type":"address"},{"indexed":true,"name":"_spender","type":"address"},{"indexed":false,"name":"_value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"_target","type":"address"},{"indexed":false,"name":"_frozen","type":"bool"}],"name":"FrozenFunds","type":"event"}];
         var abc = web3.eth.contract(abcAbi).at(abcAddress);
-        log.info("Network: Testnet");
+        log.info("Selected network: Testnet");
         break
     default:
-      console.log('Cant continue. This is an unknown network.')
+      console.log('Cant continue. This is an unknown network.');
       process.exit(1);
 }
 
@@ -93,7 +88,6 @@ var initialBalance = eth.getBalance(web3.eth.defaultAccount);
 
 /* Here the game starts */
 
-log.info("---------------------");
 log.info("Starting a new bounty distribution");
 log.info("Filename: " + inputFilePath);
 
@@ -113,13 +107,24 @@ fs.readFile('json/valid.json', 'utf8', function readFileCallback(err, data) {
                 if (validWallet.findIndex(function (item) { return item.wallet === data.WALLET }) < 0) {
                     earnedAbc = data.ENTRIES*100000000;
                     if (web3.isAddress(data.WALLET)){
-                        
+                        // gasPrice High: 36681296496, gasPrice suggested: 5000000000, gasPrice Ok: 10000000000
+                        // Verify https://etherscan.io/gasTracker and https://ethgasstation.info/ before sending.
+                        // Setting eth.gasPrice * 10
                         try {
-                            abc.transfer(data.WALLET, earnedAbc, {from: web3.eth.defaultAccount})
-                            log.info("Sent OK! email: " + data.EMAIL + ", wallet: " + data.WALLET + ", ABC: "+ earnedAbc)
-                            totalDistributed += earnedAbc;
-                            totalUsers += 1;
-                            validWallet.push({ "email": data.EMAIL, "wallet": data.WALLET });
+                            abc.transfer(data.WALLET, earnedAbc, {from: web3.eth.defaultAccount, gas: 52649, gasPrice: eth.gasPrice*10}, function(err, hash) {
+                                if (!err){
+                                    log.info("Sent OK! email: " + data.EMAIL + ", wallet: " + data.WALLET + ", ABC: "+ data.ENTRIES + ", Tx: " + hash)
+                                    totalDistributed += earnedAbc;
+                                    totalUsers += 1;
+                                    validWallet.push({ "email": data.EMAIL, "wallet": data.WALLET });
+                                } else {
+                                    totalDidntReceived += 1;
+                                    doesntReceiveWallet.push({"email":data.EMAIL, "wallet":data.WALLET});
+                                    log.warn('Couldnt send to wallet: ' + data.WALLET + ' email: ' + data.EMAIL);
+                                    log.error("It was not possible to send ABC because of an error");
+                                    log.error(err);
+                                };
+                            });
                         } catch(err) {
                             totalDidntReceived += 1;
                             doesntReceiveWallet.push({"email":data.EMAIL, "wallet":data.WALLET});
