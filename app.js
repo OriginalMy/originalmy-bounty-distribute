@@ -94,6 +94,15 @@ var stream = csv({
     strict: true,    // require column length match headers length
     headers: ['EMAIL', 'WALLET', 'ENTRIES'] // Specifing the headers
 });
+var stream2 = csv({
+    raw: false,     // do not decode to utf-8 strings
+    separator: ',', // specify optional cell separator
+    quote: '"',     // specify optional quote character
+    escape: '"',    // specify optional escape character (defaults to quote value)
+    newline: '\n',  // specify a newline character
+    strict: true,    // require column length match headers length
+    headers: ['EMAIL', 'WALLET', 'ENTRIES'] // Specifing the headers
+});
 
 
 /* Initialize accounting some vars */
@@ -101,17 +110,43 @@ var totalDistributed = 0;
 var totalUsers = 0;
 var totalInvalidWallets = 0;
 var totalDidntReceived = 0;
+var csvAbcTotal = 0;
 var invalidWallet = [];
 var receivedWallet = [];
 var didntReceiveWallet = [];
 var transferTx = [];
 
 var initialBalance = eth.getBalance(web3.eth.defaultAccount);
+try{
+    var walletAbcBalance = abc.balanceOf(web3.eth.defaultAccount)/100000000;
+} catch (e){
+    console.log("Cant get wallet ABC balance" + e);
+    process.exit(1);
+}
 
 
 /* Here the game starts */
 log.info("Starting a new bounty distribution");
 log.info("Filename: " + inputFilePath);
+
+
+var countAbc = fs.createReadStream(inputFilePath)
+    .pipe(stream2)
+    .on('data', function (data) {
+        csvAbcTotal += parseInt(data.ENTRIES);
+    })
+    .on('end', function () {
+        log.info("Wallet ABC balance: " + parseInt(walletAbcBalance));
+        log.info("Expected ABC to distribute: " + parseInt(csvAbcTotal));
+        if (parseInt(walletAbcBalance) < parseInt(csvAbcTotal)){
+            console.log("Not enough ABC. Wallet need to be funded with ABC to continue");
+            console.log("Expected : " + parseInt(csvAbcTotal) + " Balance: " + parseInt(walletAbcBalance));
+            var abcNeeded = (parseInt(csvAbcTotal) - parseInt(walletAbcBalance));
+            console.log("Funding needed: " + abcNeeded);
+            process.exit(1);
+        }
+    });
+
 
 
 /* valid.json has already sent wallet list */
@@ -139,19 +174,19 @@ fs.readFile('json/received.json', 'utf8', function readFileCallback(err, data) {
                             /*
                                 gasPrice High: 36681296496, gasPrice suggested: 5000000000, gasPrice Ok: 20000000000
                                 Verify https://etherscan.io/gasTracker and https://ethgasstation.info/ before sending.
-                                Setting eth.gasPrice * 5                        
+                                Optional setting: eth.gasPrice * 5                        
                             */
                             try {
-                                abc.transfer(data.WALLET, earnedAbc, { from: web3.eth.defaultAccount, gas: 52649, gasPrice: 20000000000 }, function (err, hash) {
+                                abc.transfer(data.WALLET, earnedAbc, { from: web3.eth.defaultAccount, gas: 52649, gasPrice: 10000000000 }, function (err, hash) {
 
                                     if (!err) {
 
                                         totalDistributed += earnedAbc;
                                         totalUsers += 1;
-                                        transferTx.push({ "wallet": data.WALLET, "tx": hash })
+                                        transferTx.push({ "wallet": data.WALLET, "tx": hash });
                                         receivedWallet.push({ "email": data.EMAIL, "wallet": data.WALLET });
+                                        log.info("Sent OK! email: " + data.EMAIL + ", wallet: " + data.WALLET + ", ABC: " + data.ENTRIES);
                                         log.info("Wallet: " + data.WALLET + ", Tx: " + hash);
-                                        log.info("Sent OK! email: " + data.EMAIL + ", wallet: " + data.WALLET + ", ABC: " + data.ENTRIES)
 
                                     } else {
 
@@ -185,7 +220,7 @@ fs.readFile('json/received.json', 'utf8', function readFileCallback(err, data) {
                             this.pause();
                             setTimeout(function () {
                                 is.resume();
-                            }, 2000);
+                            }, 3000);
 
 
                         } else {
