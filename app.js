@@ -111,29 +111,31 @@ var totalUsers = 0;
 var totalInvalidWallets = 0;
 var totalDidntReceived = 0;
 var csvAbcTotal = 0;
+var txTotal = 0;
 var invalidWallet = [];
 var receivedWallet = [];
 var didntReceiveWallet = [];
 var transferTx = [];
+var ethGas = 65000;
+var ethGasPrice = 10000000000;
 
 var initialBalance = eth.getBalance(web3.eth.defaultAccount);
-try{
+try {
     var walletAbcBalance = abc.balanceOf(web3.eth.defaultAccount)/100000000;
 } catch (e){
     console.log("Cant get wallet ABC balance" + e);
     process.exit(1);
 }
 
-
 /* Here the game starts */
 log.info("Starting a new bounty distribution");
 log.info("Filename: " + inputFilePath);
-
 
 var countAbc = fs.createReadStream(inputFilePath)
     .pipe(stream2)
     .on('data', function (data) {
         csvAbcTotal += parseInt(data.ENTRIES);
+        txTotal += 1;
     })
     .on('end', function () {
         log.info("Wallet ABC balance: " + parseInt(walletAbcBalance));
@@ -145,7 +147,15 @@ var countAbc = fs.createReadStream(inputFilePath)
             console.log("Funding needed: " + abcNeeded);
             process.exit(1);
         }
+        if (parseInt((ethGas * ethGasPrice) * txTotal) > parseInt(initialBalance)){
+            console.log("Not enough ETH. Wallet need to be funded with ETH to continue");
+            console.log("Expected : " + parseInt(web3.fromWei((ethGas * ethGasPrice) * txTotal)) + " Balance: " + parseInt(web3.fromWei(initialBalance)));
+            var ethNeeded = parseInt((ethGas * ethGasPrice) * txTotal) - parseInt(initialBalance);
+            console.log("Funding needed: " + web3.fromWei(ethNeeded));
+            process.exit(1);
+        }
     });
+
 
 
 
@@ -174,10 +184,11 @@ fs.readFile('json/received.json', 'utf8', function readFileCallback(err, data) {
                             /*
                                 gasPrice High: 36681296496, gasPrice suggested: 5000000000, gasPrice Ok: 20000000000
                                 Verify https://etherscan.io/gasTracker and https://ethgasstation.info/ before sending.
-                                Optional setting: eth.gasPrice * 5                        
+                                Optional setting: eth.gasPrice * 5 
+                                Default gas: 52649                       
                             */
                             try {
-                                abc.transfer(data.WALLET, earnedAbc, { from: web3.eth.defaultAccount, gas: 52649, gasPrice: 10000000000 }, function (err, hash) {
+                                abc.transfer(data.WALLET, earnedAbc, { from: web3.eth.defaultAccount, gas: ethGas, gasPrice: ethGasPrice }, function (err, hash) {
 
                                     if (!err) {
 
