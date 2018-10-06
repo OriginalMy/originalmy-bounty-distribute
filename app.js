@@ -250,7 +250,7 @@ fs.readFile('json/received.json', 'utf8', function readFileCallback(err, data) {
                                 this.pause();
                                 setTimeout(function () {
                                     is.resume();
-                                }, 3000);
+                                }, config.delay*1000);
                             }
                             
 

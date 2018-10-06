@@ -1,3 +1,4 @@
 {
-    "stop": true
+    "stop": true,
+    "delay": 3
 }
