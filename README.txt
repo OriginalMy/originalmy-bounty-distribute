@@ -20,3 +20,9 @@ Bounty Distribution process
 
 7) Start the distribution:
 # node app.js ./csv/<csv_file.csv>
+
+
+
+Stop the distribution
+- Open config.json 
+- change status: 'stop': true

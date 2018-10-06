@@ -4,6 +4,13 @@ const Web3 = require('web3');
 const SimpleNodeLogger = require('simple-node-logger');
 var path = require("path");
 
+var configFile = './config.json';
+var config = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
+if (config.stop == true) {
+    console.log("config.json stop == true");
+    process.exit(1);
+}    
+
 /* Creates a folder if it not exists */
 var date = Date.now();
 var dirName = './' + date;
@@ -106,6 +113,7 @@ var stream2 = csv({
 
 
 /* Initialize accounting some vars */
+var jumpDelay = 0;
 var totalDistributed = 0;
 var totalUsers = 0;
 var totalInvalidWallets = 0;
@@ -127,6 +135,12 @@ try {
     console.log("Cant get wallet ABC balance" + e);
     process.exit(1);
 }
+
+config = JSON.parse(fs.readFileSync(configFile, 'utf8'));
+if (config.stop == true) {
+    console.log("config.json stop == true");
+    process.exit(1);
+}  
 
 /* Here the game starts */
 log.info("Starting a new bounty distribution");
@@ -175,9 +189,9 @@ fs.readFile('json/received.json', 'utf8', function readFileCallback(err, data) {
             .pipe(stream)
             .on('data', function (data) {
                 try {
-
+                    config = JSON.parse(fs.readFileSync(configFile, 'utf8'));
                     /* Validate if already sent, if the wallet is valid and then the transfer */
-                    if (receivedWallet.findIndex(function (item) { return item.wallet === data.WALLET }) < 0) {
+                    if (receivedWallet.findIndex(function (item) { return item.wallet === data.WALLET }) < 0 && config.stop == false) {
 
                         earnedAbc = data.ENTRIES * 100000000;
 
@@ -199,6 +213,7 @@ fs.readFile('json/received.json', 'utf8', function readFileCallback(err, data) {
                                         receivedWallet.push({ "email": data.EMAIL, "wallet": data.WALLET });
                                         log.info("Sent OK! email: " + data.EMAIL + ", wallet: " + data.WALLET + ", ABC: " + data.ENTRIES);
                                         log.info("Wallet: " + data.WALLET + ", Tx: " + hash);
+                                        jumpDelay = 0;
 
                                     } else {
 
@@ -207,6 +222,7 @@ fs.readFile('json/received.json', 'utf8', function readFileCallback(err, data) {
                                         log.warn('Couldnt send to wallet: ' + data.WALLET + ' email: ' + data.EMAIL);
                                         log.error("It was not possible to send ABC because of an error");
                                         log.error(err);
+                                        jumpDelay = 1;
 
                                     };
 
@@ -219,6 +235,7 @@ fs.readFile('json/received.json', 'utf8', function readFileCallback(err, data) {
                                 log.warn('Couldnt send to wallet: ' + data.WALLET + ' email: ' + data.EMAIL);
                                 log.error("It was not possible to send ABC because of an error");
                                 log.error(err);
+                                jumpDelay = 1;
 
                             };
 
@@ -229,10 +246,13 @@ fs.readFile('json/received.json', 'utf8', function readFileCallback(err, data) {
                                 then resume after timeout.
                                 https://github.com/nodejs/node-v0.x-archive/issues/3767#issuecomment-9210653
                             */
-                            this.pause();
-                            setTimeout(function () {
-                                is.resume();
-                            }, 3000);
+                            if (jumpDelay == 0){
+                                this.pause();
+                                setTimeout(function () {
+                                    is.resume();
+                                }, 3000);
+                            }
+                            
 
 
                         } else {
