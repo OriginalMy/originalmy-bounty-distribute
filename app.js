@@ -117,7 +117,8 @@ var receivedWallet = [];
 var didntReceiveWallet = [];
 var transferTx = [];
 var ethGas = 65000;
-var ethGasPrice = 10000000000;
+//var ethGasPrice = 10000000000; //10gwei - 6000000000 / 6gwei
+var ethGasPrice = 6000000000;
 
 var initialBalance = eth.getBalance(web3.eth.defaultAccount);
 try {
