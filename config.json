@@ -1,4 +1,6 @@
 {
     "stop": true,
-    "delay": 3
+    "delay": 3,
+    "gasPrice": 6000000000,
+    "gas": 65000
 }

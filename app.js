@@ -123,9 +123,6 @@ var invalidWallet = [];
 var receivedWallet = [];
 var didntReceiveWallet = [];
 var transferTx = [];
-var ethGas = 65000;
-//var ethGasPrice = 10000000000; //10gwei - 6000000000 / 6gwei
-var ethGasPrice = 6000000000;
 var counter = 0;
 
 var initialBalance = eth.getBalance(web3.eth.defaultAccount);
@@ -162,10 +159,10 @@ var countAbc = fs.createReadStream(inputFilePath)
             console.log("Funding needed: " + abcNeeded);
             process.exit(1);
         }
-        if (parseInt((ethGas * ethGasPrice) * txTotal) > parseInt(initialBalance)){
+        if (parseInt((config.gas * config.gasPrice) * txTotal) > parseInt(initialBalance)){
             console.log("Not enough ETH. Wallet need to be funded with ETH to continue");
-            console.log("Expected : " + parseInt(web3.fromWei((ethGas * ethGasPrice) * txTotal)) + " Balance: " + parseInt(web3.fromWei(initialBalance)));
-            var ethNeeded = parseInt((ethGas * ethGasPrice) * txTotal) - parseInt(initialBalance);
+            console.log("Expected : " + parseInt(web3.fromWei((config.gas * config.gasPrice) * txTotal)) + " Balance: " + parseInt(web3.fromWei(initialBalance)));
+            var ethNeeded = parseInt((config.gas * config.gasPrice) * txTotal) - parseInt(initialBalance);
             console.log("Funding needed: " + web3.fromWei(ethNeeded));
             process.exit(1);
         }
@@ -204,7 +201,7 @@ fs.readFile('json/received.json', 'utf8', function readFileCallback(err, data) {
                                 Default gas: 52649                       
                             */
                             try {
-                                abc.transfer(data.WALLET, earnedAbc, { from: web3.eth.defaultAccount, gas: ethGas, gasPrice: ethGasPrice }, function (err, hash) {
+                                abc.transfer(data.WALLET, earnedAbc, { from: web3.eth.defaultAccount, gas: config.gas, gasPrice: config.gasPrice }, function (err, hash) {
 
                                     if (!err) {
 
