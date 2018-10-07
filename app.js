@@ -113,7 +113,6 @@ var stream2 = csv({
 
 
 /* Initialize accounting some vars */
-var jumpDelay = 0;
 var totalDistributed = 0;
 var totalUsers = 0;
 var totalInvalidWallets = 0;
@@ -213,7 +212,6 @@ fs.readFile('json/received.json', 'utf8', function readFileCallback(err, data) {
                                         receivedWallet.push({ "email": data.EMAIL, "wallet": data.WALLET });
                                         log.info("Sent OK! email: " + data.EMAIL + ", wallet: " + data.WALLET + ", ABC: " + data.ENTRIES);
                                         log.info("Wallet: " + data.WALLET + ", Tx: " + hash);
-                                        jumpDelay = 0;
 
                                     } else {
 
@@ -222,7 +220,6 @@ fs.readFile('json/received.json', 'utf8', function readFileCallback(err, data) {
                                         log.warn('Couldnt send to wallet: ' + data.WALLET + ' email: ' + data.EMAIL);
                                         log.error("It was not possible to send ABC because of an error");
                                         log.error(err);
-                                        jumpDelay = 1;
 
                                     };
 
@@ -235,7 +232,6 @@ fs.readFile('json/received.json', 'utf8', function readFileCallback(err, data) {
                                 log.warn('Couldnt send to wallet: ' + data.WALLET + ' email: ' + data.EMAIL);
                                 log.error("It was not possible to send ABC because of an error");
                                 log.error(err);
-                                jumpDelay = 1;
 
                             };
 
@@ -246,12 +242,10 @@ fs.readFile('json/received.json', 'utf8', function readFileCallback(err, data) {
                                 then resume after timeout.
                                 https://github.com/nodejs/node-v0.x-archive/issues/3767#issuecomment-9210653
                             */
-                            if (jumpDelay == 0){
-                                this.pause();
-                                setTimeout(function () {
-                                    is.resume();
-                                }, config.delay*1000);
-                            }
+                            this.pause();
+                            setTimeout(function () {
+                                is.resume();
+                            }, config.delay*1000);
                             
 
 
