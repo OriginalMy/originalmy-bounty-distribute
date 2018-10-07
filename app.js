@@ -126,6 +126,7 @@ var transferTx = [];
 var ethGas = 65000;
 //var ethGasPrice = 10000000000; //10gwei - 6000000000 / 6gwei
 var ethGasPrice = 6000000000;
+var counter = 0;
 
 var initialBalance = eth.getBalance(web3.eth.defaultAccount);
 try {
@@ -188,6 +189,7 @@ fs.readFile('json/received.json', 'utf8', function readFileCallback(err, data) {
             .pipe(stream)
             .on('data', function (data) {
                 try {
+                    counter += 1;
                     config = JSON.parse(fs.readFileSync(configFile, 'utf8'));
                     /* Validate if already sent, if the wallet is valid and then the transfer */
                     if (receivedWallet.findIndex(function (item) { return item.wallet === data.WALLET }) < 0 && config.stop == false) {
@@ -210,7 +212,7 @@ fs.readFile('json/received.json', 'utf8', function readFileCallback(err, data) {
                                         totalUsers += 1;
                                         transferTx.push({ "wallet": data.WALLET, "tx": hash });
                                         receivedWallet.push({ "email": data.EMAIL, "wallet": data.WALLET });
-                                        log.info("Sent OK! email: " + data.EMAIL + ", wallet: " + data.WALLET + ", ABC: " + data.ENTRIES);
+                                        log.info("Index: " + counter + " Sent OK! email: " + data.EMAIL + ", wallet: " + data.WALLET + ", ABC: " + data.ENTRIES);
                                         log.info("Wallet: " + data.WALLET + ", Tx: " + hash);
 
                                     } else {
