@@ -3,6 +3,7 @@ const csv = require('csv-parser');
 const Web3 = require('web3');
 const SimpleNodeLogger = require('simple-node-logger');
 var path = require("path");
+const json2csv = require('json2csv').parse;
 
 var configFile = './config.json';
 var config = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
@@ -280,6 +281,11 @@ fs.readFile('json/received.json', 'utf8', function readFileCallback(err, data) {
                 fs.copyFile('./' + inputFilePath, './' + date + '/' + path.basename(inputFilePath), (err) => {
                     if (err) throw err;
                     log.info(inputFilePath + ' copied to ' + date + '/' + path.basename(inputFilePath));
+                });
+                var csv = json2csv(didntReceiveWallet);
+                fs.writeFile(dirName + '/didnt-receive.csv', csv, function(err) {
+                    if (err) throw err;
+                    //console.log(csv);
                 });
 
                 /* to get job done, just log a little */
