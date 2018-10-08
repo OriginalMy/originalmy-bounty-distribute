@@ -1,6 +1,7 @@
 const fs = require('fs');
 const csv = require('csv-parser');
 const Web3 = require('web3');
+var json2csv = require('json2csv').parse;
 
 /* Creates a folder if it not exists */
 var date = Date.now();
@@ -92,6 +93,7 @@ var totalDidntReceived = 0;
 var invalidWallet = [];
 var receivedWallet = [];
 var doesntReceiveWallet = [];
+var counter = 0;
 
 /* Here the game starts */
 
@@ -102,25 +104,30 @@ log.info("Filename: " + inputFilePath);
 fs.createReadStream(inputFilePath)
     .pipe(stream)
     .on('data', function (data) {
+
+        counter+=1;
+        //console.log(counter + " Testing -> email: " + data.EMAIL + ", wallet: " + data.WALLET);
+
         try {
             if (web3.isAddress(data.WALLET)) {
                 balance = (abc.balanceOf(data.WALLET) / 100000000);
-                if (balance > 0) {
-                    ;
-                    log.info("Received: email: " + data.EMAIL + ", wallet: " + data.WALLET + ", ABC: " + balance)
-                    totalDistributed += balance;
-                    totalUsers += 1;
-                    receivedWallet.push({ "email": data.EMAIL, "wallet": data.WALLET });
+                if (balance >= data.ENTRIES) {
+                    //log.info("Received: email: " + data.EMAIL + ", wallet: " + data.WALLET + ", ABC: " + balance)
+                    //totalDistributed += data.ENTRIES;
+                    //totalUsers += 1;
+                    //receivedWallet.push({ "email": data.EMAIL, "wallet": data.WALLET });
+                    //console.log("Received: email: " + data.EMAIL + ", wallet: " + data.WALLET + ", ABC: " + balance);
                 } else {
                     totalDidntReceived += 1;
-                    doesntReceiveWallet.push({ "email": data.EMAIL, "wallet": data.WALLET });
-                    log.info("Didn't receive: email: " + data.EMAIL + ", wallet: " + data.WALLET)
+                    doesntReceiveWallet.push({ "email": data.EMAIL, "wallet": data.WALLET, "entries": data.ENTRIES });
+                    //log.info("Didn't receive: email: " + data.EMAIL + ", wallet: " + data.WALLET)                    
+                    console.log(counter + " email: " + data.EMAIL + ", wallet: " + data.WALLET + ", ABC: " + balance);
                 };
 
             } else {
                 totalInvalidWallets += 1;
                 invalidWallet.push({ "email": data.EMAIL, "wallet": data.WALLET });
-                log.warn('Invalid wallet: ' + data.WALLET + ' email: ' + data.EMAIL);
+                //log.warn('Invalid wallet: ' + data.WALLET + ' email: ' + data.EMAIL);
 
             }
 
@@ -134,13 +141,20 @@ fs.createReadStream(inputFilePath)
         /* Almost finishing, lets log something */
         saveJSONFile(invalidWallet, dirName + '/check-invalid.json');
         saveJSONFile(doesntReceiveWallet, dirName + '/check-errors.json');
-        saveJSONFile(receivedWallet, dirName + '/check-received.json');
-        log.info('Total ABC Distributed: ', totalDistributed / 100000000);
-        log.info('Received: ' + totalUsers);
+        //saveJSONFile(receivedWallet, dirName + '/check-received.json');
+        
+        //log.info('Total ABC Distributed: ', totalDistributed / 100000000);
+        //log.info('Received: ' + totalUsers);
         log.warn('Didnt receive: ' + totalDidntReceived);
         log.warn('Invalid wallets: ' + totalInvalidWallets);
         log.info("Finishing the bounty checking");
         log.info("Filename: " + inputFilePath);
+
+        var csv = json2csv(doesntReceiveWallet);
+        fs.writeFile(dirName + '/didnt-receive.csv', csv, function(err) {
+            if (err) throw err;
+            console.log(csv);
+        });
         log.info("---------------------");
     });
 
