@@ -283,11 +283,13 @@ fs.readFile('json/received.json', 'utf8', function readFileCallback(err, data) {
                     log.info(inputFilePath + ' copied to ' + date + '/' + path.basename(inputFilePath));
                 });
                 var csv = json2csv(didntReceiveWallet);
-                fs.writeFile(dirName + '/didnt-receive.csv', csv, function(err) {
-                    if (err) throw err;
-                    //console.log(csv);
-                });
-
+                if (didntReceiveWallet.length > 0){
+                    fs.writeFile(dirName + '/didnt-receive.csv', csv, function(err) {
+                        if (err) throw err;
+                        //console.log(csv);
+                    });    
+                }
+                
                 /* to get job done, just log a little */
                 log.info("---------------------");
                 log.info('Wallet Balance: ' + web3.fromWei(initialBalance) + ' eth');
