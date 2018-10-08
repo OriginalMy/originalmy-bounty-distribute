@@ -209,14 +209,14 @@ fs.readFile('json/received.json', 'utf8', function readFileCallback(err, data) {
                                         totalDistributed += earnedAbc;
                                         totalUsers += 1;
                                         transferTx.push({ "wallet": data.WALLET, "tx": hash });
-                                        receivedWallet.push({ "email": data.EMAIL, "wallet": data.WALLET });
+                                        receivedWallet.push({ "email": data.EMAIL, "wallet": data.WALLET, "entries": data.ENTRIES });
                                         log.info("Index: " + counter + " Sent OK! email: " + data.EMAIL + ", wallet: " + data.WALLET + ", ABC: " + data.ENTRIES);
                                         log.info("Wallet: " + data.WALLET + ", Tx: " + hash);
 
                                     } else {
 
                                         totalDidntReceived += 1;
-                                        didntReceiveWallet.push({ "email": data.EMAIL, "wallet": data.WALLET });
+                                        didntReceiveWallet.push({ "email": data.EMAIL, "wallet": data.WALLET, "entries": data.ENTRIES });
                                         log.warn('Couldnt send to wallet: ' + data.WALLET + ' email: ' + data.EMAIL);
                                         log.error("It was not possible to send ABC because of an error");
                                         log.error(err);
@@ -228,7 +228,7 @@ fs.readFile('json/received.json', 'utf8', function readFileCallback(err, data) {
                             } catch (err) {
 
                                 totalDidntReceived += 1;
-                                didntReceiveWallet.push({ "email": data.EMAIL, "wallet": data.WALLET });
+                                didntReceiveWallet.push({ "email": data.EMAIL, "wallet": data.WALLET, "entries": data.ENTRIES });
                                 log.warn('Couldnt send to wallet: ' + data.WALLET + ' email: ' + data.EMAIL);
                                 log.error("It was not possible to send ABC because of an error");
                                 log.error(err);
@@ -252,13 +252,13 @@ fs.readFile('json/received.json', 'utf8', function readFileCallback(err, data) {
                         } else {
 
                             totalInvalidWallets += 1;
-                            invalidWallet.push({ "email": data.EMAIL, "wallet": data.WALLET });
+                            invalidWallet.push({ "email": data.EMAIL, "wallet": data.WALLET, "entries": data.ENTRIES });
                             log.warn('Invalid wallet: ' + data.WALLET + ' email: ' + data.EMAIL);
                         }
                     } else {
 
                         totalDidntReceived += 1;
-                        didntReceiveWallet.push({ "email": data.EMAIL, "wallet": data.WALLET });
+                        didntReceiveWallet.push({ "email": data.EMAIL, "wallet": data.WALLET, "entries": data.ENTRIES });
                         log.info("Already received! email: " + data.EMAIL + ", wallet: " + data.WALLET);
                     }
                 }
@@ -299,7 +299,6 @@ fs.readFile('json/received.json', 'utf8', function readFileCallback(err, data) {
                 log.info("Finishing the bounty distribution");
                 log.info("Filename: " + inputFilePath);
                 log.info("---------------------");
-
 
             });
     };
