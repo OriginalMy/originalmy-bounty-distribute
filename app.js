@@ -284,7 +284,7 @@ fs.readFile('json/received.json', 'utf8', function readFileCallback(err, data) {
                 });
                 if (didntReceiveWallet.length > 0){
                     var csv = json2csv(didntReceiveWallet);
-                    fs.writeFile(dirName + '/didnt-receive.csv', csv, function(err) {
+                    fs.writeFile(dirName + '/didnt-receive-' + date + '.csv', csv, function(err) {
                         if (err) throw err;
                         //console.log(csv);
                     });    
