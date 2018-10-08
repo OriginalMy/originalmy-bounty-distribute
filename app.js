@@ -258,7 +258,7 @@ fs.readFile('json/received.json', 'utf8', function readFileCallback(err, data) {
                     } else {
 
                         totalDidntReceived += 1;
-                        didntReceiveWallet.push({ "email": data.EMAIL, "wallet": data.WALLET, "entries": data.ENTRIES });
+                        //didntReceiveWallet.push({ "email": data.EMAIL, "wallet": data.WALLET, "entries": data.ENTRIES });
                         log.info("Already received! email: " + data.EMAIL + ", wallet: " + data.WALLET);
                     }
                 }
